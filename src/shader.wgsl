@@ -387,11 +387,9 @@ fn fs_main(@builtin(position) position: vec4f) -> @location(0) vec4f {
 	rng_state += b;
 	rng_state ^= c;
 
-	let ray = get_ray(position.x, position.y);
-
 	var color = vec3f();
 	for (var i = 0u; i < camera.samples_per_pixel; i++) {
-		
+		let ray = get_ray(position.x, position.y);
 		color += ray_color(ray);
 	}
 	// srgb
