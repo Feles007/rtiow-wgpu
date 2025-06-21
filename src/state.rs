@@ -4,8 +4,8 @@ use std::sync::Arc;
 use std::time::Instant;
 use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use wgpu::{
-	BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayoutDescriptor, BindGroupLayoutEntry, BindingType,
-	BlendComponent, BlendState, BufferBindingType, BufferUsages, Color, ColorTargetState, ColorWrites,
+	Backends, BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayoutDescriptor, BindGroupLayoutEntry,
+	BindingType, BlendComponent, BlendState, BufferBindingType, BufferUsages, Color, ColorTargetState, ColorWrites,
 	CompositeAlphaMode, Device, DeviceDescriptor, Face, FragmentState, FrontFace, Instance, InstanceDescriptor, LoadOp,
 	MultisampleState, Operations, PipelineLayoutDescriptor, PolygonMode, PresentMode, PrimitiveState,
 	PrimitiveTopology, Queue, RenderPassColorAttachment, RenderPassDescriptor, RenderPipeline,
@@ -31,20 +31,14 @@ pub struct State {
 impl State {
 	pub async fn new(window: Arc<Window>, camera_parameters: CameraParameters, world: &World) -> State {
 		let instance = Instance::new(&InstanceDescriptor {
-			//backends: Backends::GL,
+			backends: Backends::VULKAN,
 			..Default::default()
 		});
 		let adapter = instance
 			.request_adapter(&RequestAdapterOptions::default())
 			.await
 			.unwrap();
-		let (device, queue) = {
-			let device_descriptor = DeviceDescriptor {
-				//required_features: Features::SHADER_F64,
-				..Default::default()
-			};
-			adapter.request_device(&device_descriptor).await.unwrap()
-		};
+		let (device, queue) = adapter.request_device(&DeviceDescriptor::default()).await.unwrap();
 
 		let size = window.inner_size();
 
