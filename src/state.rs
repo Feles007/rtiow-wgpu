@@ -244,12 +244,9 @@ impl State {
 			return;
 		}
 
-		let start;
-		start = Instant::now();
+		let start = Instant::now();
 
 		let surface_texture = self.surface.get_current_texture().unwrap();
-		let elapsed = start.elapsed();
-		println!("Time taken: {:?}", elapsed);
 
 		let texture_view = surface_texture.texture.create_view(&TextureViewDescriptor {
 			format: Some(self.surface_format.add_srgb_suffix()),
@@ -283,5 +280,8 @@ impl State {
 		self.queue.submit([encoder.finish()]);
 		self.window.pre_present_notify();
 		surface_texture.present();
+
+		let elapsed = start.elapsed();
+		println!("Time taken: {:?}", elapsed);
 	}
 }
