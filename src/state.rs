@@ -1,7 +1,7 @@
+use crate::app::ControlMap;
 use crate::camera::{Camera, CameraParameters};
 use crate::world::World;
 use std::sync::Arc;
-use std::time::Instant;
 use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use wgpu::{
 	Backends, BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayoutDescriptor, BindGroupLayoutEntry,
@@ -13,7 +13,7 @@ use wgpu::{
 	Surface, SurfaceConfiguration, TextureFormat, TextureUsages, TextureViewDescriptor, VertexState,
 };
 use winit::dpi::PhysicalSize;
-use winit::window::Window;
+use winit::window::{CursorGrabMode, Window};
 
 pub struct State {
 	window: Arc<Window>,
@@ -25,7 +25,7 @@ pub struct State {
 	pipeline: RenderPipeline,
 	camera: Camera,
 	bind_group: BindGroup,
-	delta_time: f32,
+	is_mouse_focused: bool,
 }
 
 impl State {
@@ -188,7 +188,7 @@ impl State {
 			pipeline,
 			camera,
 			bind_group,
-			delta_time: 0.0,
+			is_mouse_focused: false,
 		};
 
 		state.configure_surface();
@@ -214,10 +214,6 @@ impl State {
 		self.surface.configure(&self.device, &surface_config);
 	}
 
-	pub fn set_delta(&mut self, delta_time: f32) {
-		self.delta_time = delta_time;
-	}
-
 	pub fn resize(&mut self, new_size: PhysicalSize<u32>) {
 		if self.size == new_size {
 			return;
@@ -231,14 +227,12 @@ impl State {
 		}
 	}
 
-	pub fn update(&mut self) {}
+	pub fn update(&mut self, control_map: &mut ControlMap, delta_time: f32) {}
 
 	pub fn render(&mut self) {
 		if self.size.width == 0 || self.size.height == 0 {
 			return;
 		}
-
-		let start = Instant::now();
 
 		let surface_texture = self.surface.get_current_texture().unwrap();
 
@@ -274,8 +268,28 @@ impl State {
 		self.queue.submit([encoder.finish()]);
 		self.window.pre_present_notify();
 		surface_texture.present();
+	}
 
-		let elapsed = start.elapsed();
-		println!("Time taken: {:?}", elapsed);
+	pub fn focus(&mut self) {
+		let result = self.window.set_cursor_grab(CursorGrabMode::Confined);
+		match result {
+			Ok(_) => {},
+			Err(_) => {
+				self.window.set_cursor_grab(CursorGrabMode::Locked).unwrap();
+			},
+		}
+		self.window.set_cursor_visible(false);
+		self.is_mouse_focused = true;
+	}
+	pub fn unfocus(&mut self) {
+		self.window.set_cursor_grab(CursorGrabMode::None).unwrap();
+		self.window.set_cursor_visible(true);
+		self.is_mouse_focused = false;
+	}
+	pub fn is_mouse_focused(&self) -> bool {
+		self.is_mouse_focused
+	}
+	pub fn request_redraw(&self) {
+		self.window.request_redraw();
 	}
 }
