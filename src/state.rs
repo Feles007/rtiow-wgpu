@@ -1,6 +1,7 @@
 use crate::app::ControlMap;
 use crate::camera::{Camera, CameraParameters};
 use crate::world::World;
+use glam::vec3;
 use std::sync::Arc;
 use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use wgpu::{
@@ -227,7 +228,42 @@ impl State {
 		}
 	}
 
-	pub fn update(&mut self, control_map: &mut ControlMap, delta_time: f32) {}
+	pub fn update(&mut self, control_map: &mut ControlMap, delta_time: f32) {
+		let zoom_speed = 10.0;
+		let sensitivity = 0.1;
+		let movement_speed = 5.0;
+
+		if control_map.zoom_in {
+			self.camera.parameters.fov -= zoom_speed * delta_time;
+		} else if control_map.zoom_out {
+			self.camera.parameters.fov += zoom_speed * delta_time;
+		}
+
+		self.camera.parameters.pitch += control_map.move_pitch * sensitivity * delta_time;
+		self.camera.parameters.yaw -= control_map.move_yaw * sensitivity * delta_time;
+		control_map.move_pitch = 0.0;
+		control_map.move_yaw = 0.0;
+
+		let ys = self.camera.parameters.yaw.sin();
+		let yc = self.camera.parameters.yaw.cos();
+
+		let backward = vec3(ys, 0.0, yc);
+		let up = vec3(0.0, 1.0, 0.0);
+		let left = backward.cross(up);
+
+		if control_map.move_forward {
+			self.camera.parameters.location -= backward * movement_speed * delta_time;
+		} else if control_map.move_backward {
+			self.camera.parameters.location += backward * movement_speed * delta_time;
+		}
+		if control_map.move_left {
+			self.camera.parameters.location += left * movement_speed * delta_time;
+		} else if control_map.move_right {
+			self.camera.parameters.location -= left * movement_speed * delta_time;
+		}
+
+		self.camera.update_buffer(&self.queue);
+	}
 
 	pub fn render(&mut self) {
 		if self.size.width == 0 || self.size.height == 0 {

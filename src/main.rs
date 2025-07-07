@@ -11,6 +11,7 @@ use crate::material::Material;
 use crate::sphere::Sphere;
 use crate::world::World;
 use glam::vec3;
+use std::f32::consts::FRAC_PI_2;
 use winit::event_loop::{ControlFlow, EventLoop};
 
 fn main() {
@@ -96,12 +97,16 @@ fn setup() -> (World, CameraParameters) {
 		world
 	};
 
+	let pitch = 0.0;
+	let yaw = FRAC_PI_2;
+
 	let camera_parameters = CameraParameters {
 		samples_per_pixel: 3,
 		max_depth: 5,
 		fov: 20.0,
-		look_from: vec3(13.0, 2.0, 3.0),
-		look_at: vec3(0.0, 0.0, 0.0),
+		location: vec3(13.0, 2.0, 3.0),
+		pitch,
+		yaw,
 	};
 
 	(world, camera_parameters)

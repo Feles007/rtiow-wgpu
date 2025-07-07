@@ -5,8 +5,9 @@ pub struct CameraParameters {
 	pub samples_per_pixel: u32,
 	pub max_depth: u32,
 	pub fov: f32,
-	pub look_from: Vec3,
-	pub look_at: Vec3,
+	pub location: Vec3,
+	pub pitch: f32,
+	pub yaw: f32,
 }
 pub struct Camera {
 	pub parameters: CameraParameters,
@@ -31,9 +32,11 @@ impl Camera {
 	pub fn update_buffer(&self, queue: &Queue) {
 		let camera_uniform = {
 			let p = &self.parameters;
-			let center = p.look_from;
 
-			let focal_length = (p.look_from - p.look_at).length();
+			let center = p.location;
+			let direction = make_look(p.pitch, p.yaw);
+
+			let focal_length = direction.length();
 			let theta = p.fov.to_radians();
 			let h = (theta / 2.0).tan();
 			let viewport_height = 2.0 * h * focal_length;
@@ -41,7 +44,7 @@ impl Camera {
 
 			let up_vector = vec3(0.0, 1.0, 0.0);
 
-			let w = (p.look_from - p.look_at).normalize();
+			let w = direction.normalize();
 			let u = up_vector.cross(w).normalize();
 			let v = w.cross(u);
 
@@ -82,4 +85,7 @@ pub struct CameraUniform {
 	_p2: u32,
 	pixel_delta_v: Vec3,
 	_p3: u32,
+}
+pub fn make_look(pitch: f32, yaw: f32) -> Vec3 {
+	vec3(yaw.sin() * pitch.cos(), pitch.sin(), yaw.cos() * pitch.cos())
 }
