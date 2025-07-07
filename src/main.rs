@@ -103,7 +103,7 @@ fn setup() -> (World, CameraParameters) {
 	let camera_parameters = CameraParameters {
 		samples_per_pixel: 3,
 		max_depth: 5,
-		fov: 20.0,
+		fov: 75.0,
 		location: vec3(13.0, 2.0, 3.0),
 		pitch,
 		yaw,
