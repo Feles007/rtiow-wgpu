@@ -232,7 +232,7 @@ impl State {
 
 	pub fn update(&mut self, control_map: &mut ControlMap, delta_time: f32) {
 		let zoom_speed = 10.0;
-		let sensitivity = 0.001;
+		let sensitivity = 0.005;
 		let movement_speed = 5.0;
 
 		if control_map.zoom_in {
