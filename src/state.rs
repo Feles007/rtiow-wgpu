@@ -224,6 +224,8 @@ impl State {
 
 		if self.size.width > 0 && self.size.height > 0 {
 			self.configure_surface();
+			self.camera.width = self.size.width;
+			self.camera.height = self.size.height;
 			self.camera.update_buffer(&self.queue);
 		}
 	}
