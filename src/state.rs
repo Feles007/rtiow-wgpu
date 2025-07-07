@@ -230,7 +230,7 @@ impl State {
 
 	pub fn update(&mut self, control_map: &mut ControlMap, delta_time: f32) {
 		let zoom_speed = 10.0;
-		let sensitivity = 0.1;
+		let sensitivity = 0.001;
 		let movement_speed = 5.0;
 
 		if control_map.zoom_in {
@@ -239,8 +239,8 @@ impl State {
 			self.camera.parameters.fov += zoom_speed * delta_time;
 		}
 
-		self.camera.parameters.pitch += control_map.move_pitch * sensitivity * delta_time;
-		self.camera.parameters.yaw -= control_map.move_yaw * sensitivity * delta_time;
+		self.camera.parameters.pitch += control_map.move_pitch * sensitivity;
+		self.camera.parameters.yaw -= control_map.move_yaw * sensitivity;
 		control_map.move_pitch = 0.0;
 		control_map.move_yaw = 0.0;
 

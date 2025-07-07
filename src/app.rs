@@ -119,13 +119,12 @@ impl ApplicationHandler for App {
 				let start = Instant::now();
 				state.update(control_map, *delta_time);
 				state.render();
-				let elapsed = start.elapsed();
-
-				*delta_time = elapsed.as_secs_f32();
-
-				println!("Frame time: {:?}", elapsed);
 
 				state.request_redraw();
+
+				let elapsed = start.elapsed();
+				*delta_time = elapsed.as_secs_f32();
+				println!("Frame time: {:?}", elapsed);
 			},
 			WindowEvent::Resized(size) => {
 				state.resize(size);
