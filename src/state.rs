@@ -197,10 +197,6 @@ impl State {
 		state
 	}
 
-	pub fn get_window(&self) -> &Window {
-		&self.window
-	}
-
 	fn configure_surface(&self) {
 		let surface_config = SurfaceConfiguration {
 			usage: TextureUsages::RENDER_ATTACHMENT,
