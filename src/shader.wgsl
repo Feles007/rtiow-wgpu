@@ -376,16 +376,10 @@ fn background_color(ray: Ray) -> vec3f {
 
 @fragment
 fn fs_main(@builtin(position) position: vec4f) -> @location(0) vec4f {
-	let a = u32(position.x);
-	let b = u32(position.y);
-	let c = u32(position.x * position.y);
 
-	rng_state += a;
-	rng_state ^= b;
-	rng_state += c;
-	rng_state ^= a;
-	rng_state += b;
-	rng_state ^= c;
+	rng_state ^= bitcast<u32>(
+		sin(7.289 * position.x + 11.23 * position.y) * 23758.5453
+	);
 
 	var color = vec3f();
 	for (var i = 0u; i < camera.samples_per_pixel; i++) {
