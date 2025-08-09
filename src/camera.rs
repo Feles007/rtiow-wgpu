@@ -70,7 +70,7 @@ impl Camera {
 		};
 		queue.write_buffer(&self.buffer, 0, bytemuck::bytes_of(&camera_uniform));
 	}
-	pub fn binding(&self) -> BindingResource {
+	pub fn binding(&self) -> BindingResource<'_> {
 		self.buffer.as_entire_binding()
 	}
 }
