@@ -219,7 +219,7 @@ fn refract2(uv: vec3f, n: vec3f, etai_over_etat: f32) -> vec3f {
 	let cos_theta = min(dot(-uv, n), 1.0);
 	let r_out_perp = etai_over_etat * (uv + cos_theta * n);
 	let r_out_parallel =
-		sqrt(abs(-(1.0 - dot(r_out_perp, r_out_perp)))) * n;
+		-sqrt(abs((1.0 - dot(r_out_perp, r_out_perp)))) * n;
 	return r_out_perp + r_out_parallel;
 }
 
