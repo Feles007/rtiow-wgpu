@@ -1,3 +1,5 @@
+import package::rng;
+
 //
 // Camera
 //
@@ -26,51 +28,6 @@ fn near_zero(v: vec3f) -> bool {
 		(abs(v.y) < EPSILON) &&
 		(abs(v.z) < EPSILON)
 	;
-}
-
-//
-// RNG
-//
-
-var<private> rng_state: u32 = 0xE9BE815E;
-const SIGN_EXP: u32 = 0x3F800000;
-
-fn random_u32() -> u32 {
-	var x = rng_state;
-	x ^= x << 13u;
-	x ^= x >> 17u;
-	x ^= x << 5u;
-	rng_state = x;
-	return x;
-}
-
-fn random_f32() -> f32 {
-	let x = random_u32();
-	let bits = (x >> 9) | SIGN_EXP;
-	return bitcast<f32>(bits) - 1.0;
-}
-
-fn random_f32_range(min: f32, max: f32) -> f32 {
-	return min + (max - min) * random_f32();
-}
-
-fn random_vector_range(min: f32, max: f32) -> vec3f {
-	return vec3f(
-		random_f32_range(min, max),
-		random_f32_range(min, max),
-		random_f32_range(min, max),
-	);
-}
-
-fn random_unit_vector() -> vec3f {
-	loop {
-		let p = random_vector_range(-1, 1);
-		let length_squared = dot(p, p);
-		if EPSILON < length_squared && length_squared <= 1.0 {
-			return p / sqrt(length_squared);
-		}
-	}
-	return vec3f(0);
 }
 
 //
@@ -106,7 +63,7 @@ fn ray_at(ray: Ray, t: f32) -> vec3f {
 	return ray.origin + t * ray.direction;
 }
 fn get_ray(x: f32, y: f32) -> Ray {
-	let offset = vec3f(random_f32() - 0.5, random_f32() - 0.5, 0);
+	let offset = vec3f(rng::float() - 0.5, rng::float() - 0.5, 0);
 	let pixel_sample = camera.pixel00_loc
 		+ ((x + offset.x) * camera.pixel_delta_u)
 		+ ((y + offset.y) * camera.pixel_delta_v);
@@ -145,7 +102,7 @@ fn scatter(material_reference: MaterialReference, ray: Ray, hit_record: HitRecor
 		case 0: {
 			let albedo = material.data.xyz;
 
-			var scatter_direction = hit_record.normal + random_unit_vector();
+			var scatter_direction = hit_record.normal + rng::unit_vector();
 			if near_zero(scatter_direction) {
 				scatter_direction = hit_record.normal;
 			}
@@ -160,7 +117,7 @@ fn scatter(material_reference: MaterialReference, ray: Ray, hit_record: HitRecor
 
 			let reflected =
 				normalize(reflect(ray.direction, hit_record.normal)) +
-				(fuzz * random_unit_vector())
+				(fuzz * rng::unit_vector())
 			;
 			result.color = albedo;
 			result.ray = new_ray(hit_record.point, reflected);
@@ -183,7 +140,7 @@ fn scatter(material_reference: MaterialReference, ray: Ray, hit_record: HitRecor
 			let sin_theta = sqrt(1.0 - cos_theta * cos_theta);
 
 			var direction: vec3f;
-			if (ri * sin_theta > 1.0) || (reflectance(cos_theta, ri) > random_f32()) {
+			if (ri * sin_theta > 1.0) || (reflectance(cos_theta, ri) > rng::float()) {
 				direction = reflect(unit_direction, hit_record.normal);
 			} else {
 				direction = refract2(unit_direction, hit_record.normal, ri);
@@ -360,9 +317,7 @@ fn background_color(ray: Ray) -> vec3f {
 @fragment
 fn fs_main(@builtin(position) position: vec4f) -> @location(0) vec4f {
 
-	rng_state ^= bitcast<u32>(
-		sin(7.289 * position.x + 11.23 * position.y) * 23758.5453
-	);
+	rng::seed(position.xy);
 
 	var color = vec3f();
 	for (var i = 0u; i < camera.samples_per_pixel; i++) {
