@@ -37,12 +37,5 @@ fn vector_range(min: f32, max: f32) -> vec3f {
 }
 
 fn unit_vector() -> vec3f {
-	loop {
-		let p = vector_range(-1, 1);
-		let length_squared = dot(p, p);
-		if EPSILON < length_squared && length_squared <= 1.0 {
-			return p / sqrt(length_squared);
-		}
-	}
-	return vec3f(0);
+	return normalize(vector_range(-1, 1));
 }
