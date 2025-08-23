@@ -101,8 +101,8 @@ fn setup() -> (World, CameraParameters) {
 	let yaw = FRAC_PI_2;
 
 	let camera_parameters = CameraParameters {
-		samples_per_pixel: 3,
-		max_depth: 5,
+		samples_per_pixel: 10,
+		max_depth: 10,
 		fov: 75.0,
 		location: vec3(13.0, 2.0, 3.0),
 		pitch,
