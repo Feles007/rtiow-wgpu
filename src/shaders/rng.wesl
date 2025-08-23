@@ -1,3 +1,5 @@
+import package::util::EPSILON;
+
 var<private> rng_state: u32 = 0xE9BE815E;
 const SIGN_EXP: u32 = 0x3F800000;
 
