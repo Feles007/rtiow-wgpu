@@ -386,6 +386,6 @@ fn fs_main(@builtin(position) position: vec4f) -> @location(0) vec4f {
 		let ray = get_ray(position.x, position.y);
 		color += ray_color(ray);
 	}
-	// srgb
-	return vec4f(sqrt(color / f32(camera.samples_per_pixel)), 1.0);
+	color /= f32(camera.samples_per_pixel);
+	return vec4f(color, 1.0);
 }
