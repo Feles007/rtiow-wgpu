@@ -10,3 +10,7 @@ bytemuck = "1.23.0"
 pollster = "0.4.0"
 env_logger = "0.11.8"
 glam = { version = "0.30.4", features = ["bytemuck"] }
+wesl = "0.2.0"
+
+[build-dependencies]
+wesl = "0.2.0"

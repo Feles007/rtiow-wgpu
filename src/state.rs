@@ -3,6 +3,7 @@ use crate::camera::{Camera, CameraParameters};
 use crate::world::World;
 use glam::vec3;
 use std::sync::Arc;
+use wesl::include_wesl;
 use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use wgpu::{
 	Backends, BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayoutDescriptor, BindGroupLayoutEntry,
@@ -117,9 +118,13 @@ impl State {
 		});
 
 		let pipeline = {
-			let shader = device.create_shader_module(ShaderModuleDescriptor {
-				label: Some("Shader"),
-				source: ShaderSource::Wgsl(include_str!("shader.wgsl").into()),
+			let fragment_shader = device.create_shader_module(ShaderModuleDescriptor {
+				label: Some("Fragment Shader"),
+				source: ShaderSource::Wgsl(include_wesl!("fragment").into()),
+			});
+			let vertex_shader = device.create_shader_module(ShaderModuleDescriptor {
+				label: Some("Vertex Shader"),
+				source: ShaderSource::Wgsl(include_wesl!("vertex").into()),
 			});
 
 			let render_pipeline_layout = device.create_pipeline_layout(&PipelineLayoutDescriptor {
@@ -132,13 +137,13 @@ impl State {
 				label: Some("Render Pipeline"),
 				layout: Some(&render_pipeline_layout),
 				vertex: VertexState {
-					module: &shader,
+					module: &vertex_shader,
 					entry_point: Some("vs_main"),
 					buffers: &[],
 					compilation_options: Default::default(),
 				},
 				fragment: Some(FragmentState {
-					module: &shader,
+					module: &fragment_shader,
 					entry_point: Some("fs_main"),
 					targets: &[Some(ColorTargetState {
 						format: surface_format,
