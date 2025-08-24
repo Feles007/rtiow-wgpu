@@ -4,9 +4,7 @@ var<private> rng_state: u32 = 0xE9BE815E;
 const SIGN_EXP: u32 = 0x3F800000;
 
 fn seed(position: vec2f) {
-	rng_state ^= bitcast<u32>(
-		sin(7.289 * position.x + 11.23 * position.y) * 23758.5453
-	);
+	rng_state ^= bitcast<u32>(position.x) ^ (bitcast<u32>(position.y) * 0x9e3779b9u);
 }
 
 fn bits() -> u32 {
