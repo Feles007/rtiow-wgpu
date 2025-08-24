@@ -33,7 +33,7 @@ pub struct State {
 impl State {
 	pub async fn new(window: Arc<Window>, camera_parameters: CameraParameters, world: &World) -> State {
 		let instance = Instance::new(&InstanceDescriptor {
-			backends: Backends::VULKAN,
+			backends: Backends::DX12,
 			..Default::default()
 		});
 		let adapter = instance
